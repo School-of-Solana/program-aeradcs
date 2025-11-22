@@ -33,14 +33,26 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({
   useEffect(() => {
     console.log("🔍 Checking for Solana wallets in window object...");
     console.log("Window.solana:", window.solana);
-    console.log("Window.backpack:", (window as any).backpack);
-    console.log("Window.phantom:", (window as any).phantom);
+    console.log(
+      "Window.backpack:",
+      (window as unknown as Record<string, unknown>).backpack
+    );
+    console.log(
+      "Window.phantom:",
+      (window as unknown as Record<string, unknown>).phantom
+    );
 
     setTimeout(() => {
       console.log("⏰ After 1 second delay:");
       console.log("Window.solana:", window.solana);
-      console.log("Window.backpack:", (window as any).backpack);
-      console.log("Window.phantom:", (window as any).phantom);
+      console.log(
+        "Window.backpack:",
+        (window as unknown as Record<string, unknown>).backpack
+      );
+      console.log(
+        "Window.phantom:",
+        (window as unknown as Record<string, unknown>).phantom
+      );
     }, 1000);
   }, []);
 

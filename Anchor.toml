@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-subscriptions_dapp = "GYqT2YbmDGZzD8Px4j14Wx3Jap7BM9oqgFJ1A19NMNka"
+subscriptions_dapp = "8hSScVud3dY7iV2r4aGDFBduXAZh5j31X3P8GnCaznZd"
 
 [registry]
 url = "https://api.apr.dev"

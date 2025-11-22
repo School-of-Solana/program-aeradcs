@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
 
-declare_id!("GYqT2YbmDGZzD8Px4j14Wx3Jap7BM9oqgFJ1A19NMNka");
+declare_id!("8hSScVud3dY7iV2r4aGDFBduXAZh5j31X3P8GnCaznZd");
 
 #[program]
 pub mod subscriptions_dapp {
