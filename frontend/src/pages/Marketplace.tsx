@@ -258,6 +258,9 @@ export const Marketplace = () => {
             const planKey = `${plan.account.creator.toBase58()}-${plan.account.planId.toString()}`;
             const isSubscribed = subscriptionStatus[planKey] || false;
             const isSubscribing = subscribingTo === planKey;
+            const isOwnPlan = publicKey
+              ? plan.account.creator.equals(publicKey)
+              : false;
 
             return (
               <div
@@ -373,12 +376,14 @@ export const Marketplace = () => {
 
                 <button
                   onClick={() => handleSubscribe(plan)}
-                  disabled={!publicKey || isSubscribed || isSubscribing}
+                  disabled={
+                    !publicKey || isSubscribed || isSubscribing || isOwnPlan
+                  }
                   style={{
                     width: "100%",
                     padding: "0.75rem",
                     backgroundColor:
-                      !publicKey || isSubscribed || isSubscribing
+                      !publicKey || isSubscribed || isSubscribing || isOwnPlan
                         ? "#9ca3af"
                         : "#512da8",
                     color: "white",
@@ -387,24 +392,36 @@ export const Marketplace = () => {
                     fontSize: "0.875rem",
                     fontWeight: "500",
                     cursor:
-                      !publicKey || isSubscribed || isSubscribing
+                      !publicKey || isSubscribed || isSubscribing || isOwnPlan
                         ? "not-allowed"
                         : "pointer",
                     transition: "background-color 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    if (publicKey && !isSubscribed && !isSubscribing) {
+                    if (
+                      publicKey &&
+                      !isSubscribed &&
+                      !isSubscribing &&
+                      !isOwnPlan
+                    ) {
                       e.currentTarget.style.backgroundColor = "#3f1d87";
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (publicKey && !isSubscribed && !isSubscribing) {
+                    if (
+                      publicKey &&
+                      !isSubscribed &&
+                      !isSubscribing &&
+                      !isOwnPlan
+                    ) {
                       e.currentTarget.style.backgroundColor = "#512da8";
                     }
                   }}
                 >
                   {!publicKey
                     ? "Connect Wallet"
+                    : isOwnPlan
+                    ? "Your Plan"
                     : isSubscribed
                     ? "Already Subscribed"
                     : isSubscribing
