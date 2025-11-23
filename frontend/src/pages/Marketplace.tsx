@@ -159,9 +159,24 @@ export const Marketplace = () => {
       await fetchPlans();
     } catch (err) {
       console.error("Error subscribing:", err);
-      setError(
-        (err as Error).message || "Failed to subscribe. Please try again."
-      );
+
+      let errorMessage = "Failed to subscribe. Please try again.";
+      const errMsg = (err as Error).message;
+
+      if (errMsg.includes("InsufficientFunds")) {
+        errorMessage =
+          "Insufficient funds. You need enough SOL to cover the subscription price plus transaction fees.";
+      } else if (errMsg.includes("CannotSubscribeToOwnPlan")) {
+        errorMessage = "You cannot subscribe to your own plan.";
+      } else if (errMsg.includes("CreatorMismatch")) {
+        errorMessage = "Creator account mismatch. Please try again.";
+      } else if (errMsg.includes("already in use")) {
+        errorMessage = "You are already subscribed to this plan.";
+      } else if (errMsg.includes("User rejected")) {
+        errorMessage = "Transaction was cancelled.";
+      }
+
+      setError(errorMessage);
     } finally {
       setSubscribingTo(null);
     }

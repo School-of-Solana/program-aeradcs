@@ -111,9 +111,32 @@ export const CreatePlan = () => {
       }, 2000);
     } catch (err) {
       console.error("Error creating plan:", err);
-      setError(
-        (err as Error).message || "Failed to create plan. Please try again."
-      );
+
+      let errorMessage = "Failed to create plan. Please try again.";
+      const errMsg = (err as Error).message;
+
+      if (errMsg.includes("InvalidPrice")) {
+        errorMessage = "Price must be greater than 0.";
+      } else if (errMsg.includes("PriceTooHigh")) {
+        errorMessage = "Price exceeds maximum allowed (1000 SOL).";
+      } else if (errMsg.includes("InvalidDuration")) {
+        errorMessage = "Duration must be at least 1 day.";
+      } else if (errMsg.includes("DurationTooLong")) {
+        errorMessage = "Duration exceeds maximum allowed (365 days).";
+      } else if (errMsg.includes("EmptyPlanName")) {
+        errorMessage = "Plan name cannot be empty.";
+      } else if (errMsg.includes("PlanNameTooLong")) {
+        errorMessage = "Plan name exceeds maximum length (200 characters).";
+      } else if (errMsg.includes("InsufficientFundsToCreatePlan")) {
+        errorMessage =
+          "Insufficient funds to create plan. You need SOL to pay for account rent.";
+      } else if (errMsg.includes("already in use")) {
+        errorMessage = "This plan already exists.";
+      } else if (errMsg.includes("User rejected")) {
+        errorMessage = "Transaction was cancelled.";
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
