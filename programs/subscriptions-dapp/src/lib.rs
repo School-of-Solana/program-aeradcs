@@ -8,6 +8,10 @@ pub mod state;
 
 use instructions::*;
 
+pub const MAX_PLAN_PRICE: u64 = 1_000_000_000_000;
+pub const MAX_DURATION_DAYS: u32 = 365;
+pub const TRANSACTION_FEE_BUFFER: u64 = 10_000_000;
+
 #[program]
 pub mod subscriptions_dapp {
     use super::*;

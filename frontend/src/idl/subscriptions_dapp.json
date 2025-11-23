@@ -266,6 +266,61 @@
       "code": 6000,
       "name": "SubscriptionExpired",
       "msg": "Subscription has expired"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidPrice",
+      "msg": "Price must be greater than 0"
+    },
+    {
+      "code": 6002,
+      "name": "PriceTooHigh",
+      "msg": "Price exceeds maximum allowed (1000 SOL)"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidDuration",
+      "msg": "Duration must be at least 1 day"
+    },
+    {
+      "code": 6004,
+      "name": "DurationTooLong",
+      "msg": "Duration exceeds maximum allowed (365 days)"
+    },
+    {
+      "code": 6005,
+      "name": "EmptyPlanName",
+      "msg": "Plan name cannot be empty"
+    },
+    {
+      "code": 6006,
+      "name": "PlanNameTooLong",
+      "msg": "Plan name exceeds maximum length (200 characters)"
+    },
+    {
+      "code": 6007,
+      "name": "InsufficientFundsToCreatePlan",
+      "msg": "Insufficient funds to create plan (need rent for account)"
+    },
+    {
+      "code": 6008,
+      "name": "CannotSubscribeToOwnPlan",
+      "msg": "Cannot subscribe to your own plan"
+    },
+    {
+      "code": 6009,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds to subscribe (need price + rent)"
+    },
+    {
+      "code": 6010,
+      "name": "CreatorMismatch",
+      "msg": "Creator account mismatch"
+    },
+    {
+      "code": 6011,
+      "name": "MathOverflow",
+      "msg": "Mathematical operation overflow"
     }
   ],
   "types": [

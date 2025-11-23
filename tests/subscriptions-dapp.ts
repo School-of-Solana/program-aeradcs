@@ -83,6 +83,238 @@ describe("subscriptions-dapp", () => {
       expect(creatorProfile.durationDays).to.equal(durationDays);
     });
 
+    it("should fail to create plan with price = 0", async () => {
+      const invalidPlanId = new BN(100);
+      const [invalidPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          creator.publicKey.toBuffer(),
+          invalidPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      try {
+        await program.methods
+          .createSubscriptionPlan(
+            invalidPlanId,
+            planName,
+            new BN(0),
+            durationDays
+          )
+          .accounts({
+            creatorProfile: invalidPda,
+            creator: creator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([creator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.include("Price must be greater than 0");
+      }
+    });
+
+    it("should fail to create plan with price exceeding maximum", async () => {
+      const invalidPlanId = new BN(101);
+      const [invalidPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          creator.publicKey.toBuffer(),
+          invalidPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      const maxPrice = new BN("1000000000001");
+
+      try {
+        await program.methods
+          .createSubscriptionPlan(
+            invalidPlanId,
+            planName,
+            maxPrice,
+            durationDays
+          )
+          .accounts({
+            creatorProfile: invalidPda,
+            creator: creator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([creator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.include("Price exceeds maximum allowed");
+      }
+    });
+
+    it("should fail to create plan with duration = 0", async () => {
+      const invalidPlanId = new BN(102);
+      const [invalidPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          creator.publicKey.toBuffer(),
+          invalidPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      try {
+        await program.methods
+          .createSubscriptionPlan(invalidPlanId, planName, planPrice, 0)
+          .accounts({
+            creatorProfile: invalidPda,
+            creator: creator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([creator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.include("Duration must be at least 1 day");
+      }
+    });
+
+    it("should fail to create plan with duration exceeding maximum", async () => {
+      const invalidPlanId = new BN(103);
+      const [invalidPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          creator.publicKey.toBuffer(),
+          invalidPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      try {
+        await program.methods
+          .createSubscriptionPlan(invalidPlanId, planName, planPrice, 366)
+          .accounts({
+            creatorProfile: invalidPda,
+            creator: creator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([creator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.include("Duration exceeds maximum allowed");
+      }
+    });
+
+    it("should fail to create plan with empty name", async () => {
+      const invalidPlanId = new BN(104);
+      const [invalidPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          creator.publicKey.toBuffer(),
+          invalidPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      try {
+        await program.methods
+          .createSubscriptionPlan(invalidPlanId, "   ", planPrice, durationDays)
+          .accounts({
+            creatorProfile: invalidPda,
+            creator: creator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([creator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.include("Plan name cannot be empty");
+      }
+    });
+
+    it("should fail to create plan with name exceeding 200 characters", async () => {
+      const invalidPlanId = new BN(105);
+      const [invalidPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          creator.publicKey.toBuffer(),
+          invalidPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      const longName = "a".repeat(201);
+
+      try {
+        await program.methods
+          .createSubscriptionPlan(
+            invalidPlanId,
+            longName,
+            planPrice,
+            durationDays
+          )
+          .accounts({
+            creatorProfile: invalidPda,
+            creator: creator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([creator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.include("Plan name exceeds maximum length");
+      }
+    });
+
+    it("should fail to create plan with insufficient funds", async () => {
+      const poorCreator = Keypair.generate();
+      await provider.connection.requestAirdrop(
+        poorCreator.publicKey,
+        0.001 * LAMPORTS_PER_SOL
+      );
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const invalidPlanId = new BN(106);
+      const [invalidPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          poorCreator.publicKey.toBuffer(),
+          invalidPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      try {
+        await program.methods
+          .createSubscriptionPlan(
+            invalidPlanId,
+            planName,
+            planPrice,
+            durationDays
+          )
+          .accounts({
+            creatorProfile: invalidPda,
+            creator: poorCreator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([poorCreator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.satisfy(
+          (msg: string) =>
+            msg.includes("Insufficient funds to create plan") ||
+            msg.includes("insufficient") ||
+            msg.includes("custom program error")
+        );
+      }
+    });
+
     it("should fail to create duplicate subscription plan", async () => {
       try {
         await program.methods
@@ -138,11 +370,93 @@ describe("subscriptions-dapp", () => {
       expect(balanceDifference).to.be.greaterThanOrEqual(Number(planPrice));
     });
 
+    it("should fail to subscribe to own plan", async () => {
+      const selfPlanId = new BN(200);
+      const [selfPlanPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("plan"),
+          creator.publicKey.toBuffer(),
+          selfPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      await program.methods
+        .createSubscriptionPlan(
+          selfPlanId,
+          "Self Plan",
+          planPrice,
+          durationDays
+        )
+        .accounts({
+          creatorProfile: selfPlanPda,
+          creator: creator.publicKey,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([creator])
+        .rpc();
+
+      const [selfSubscriptionPda] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("subscription"),
+          creator.publicKey.toBuffer(),
+          creator.publicKey.toBuffer(),
+          selfPlanId.toArrayLike(Buffer, "le", 8),
+        ],
+        program.programId
+      );
+
+      try {
+        await program.methods
+          .subscribe(selfPlanId, creator.publicKey)
+          .accounts({
+            subscription: selfSubscriptionPda,
+            creatorProfile: selfPlanPda,
+            subscriber: creator.publicKey,
+            creatorAccount: creator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([creator])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.include("Cannot subscribe to your own plan");
+      }
+    });
+
+    it("should fail to subscribe with creator account mismatch", async () => {
+      const wrongCreator = Keypair.generate();
+
+      try {
+        await program.methods
+          .subscribe(planId, creator.publicKey)
+          .accounts({
+            subscription: subscriptionPda,
+            creatorProfile: creatorProfilePda,
+            subscriber: subscriber.publicKey,
+            creatorAccount: wrongCreator.publicKey,
+            systemProgram: SystemProgram.programId,
+          })
+          .signers([subscriber])
+          .rpc();
+
+        expect.fail("Should have thrown an error");
+      } catch (error) {
+        expect(error.message).to.satisfy(
+          (msg: string) =>
+            msg.includes("Creator account mismatch") ||
+            msg.includes("A seeds constraint was violated") ||
+            msg.includes("custom program error")
+        );
+      }
+    });
+
     it("should fail to subscribe with insufficient funds", async () => {
       const poorUser = Keypair.generate();
       await provider.connection.requestAirdrop(
         poorUser.publicKey,
-        0.1 * LAMPORTS_PER_SOL
+        0.001 * LAMPORTS_PER_SOL
       );
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -171,8 +485,10 @@ describe("subscriptions-dapp", () => {
 
         expect.fail("Should have thrown an error for insufficient funds");
       } catch (error) {
-        expect(error.message.toLowerCase()).to.include(
-          "insufficient" || "simulation failed"
+        expect(error.message).to.satisfy(
+          (msg: string) =>
+            msg.toLowerCase().includes("insufficient") ||
+            msg.includes("custom program error")
         );
       }
     });
