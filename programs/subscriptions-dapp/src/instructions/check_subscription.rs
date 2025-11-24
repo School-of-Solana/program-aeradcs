@@ -8,7 +8,7 @@ pub fn _check_subscription(ctx: Context<CheckSubscription>) -> Result<bool> {
     if current_time <= subscription.expires_at {
         return Ok(true);
     } else {
-        return Ok(true);
+        return Ok(false);
     }
 }
 
