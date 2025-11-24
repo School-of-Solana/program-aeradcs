@@ -8,12 +8,25 @@ import type { SubscriptionsDapp } from "../types/subscriptions_dapp";
 export const PROGRAM_ID = new PublicKey(import.meta.env.VITE_PROGRAM_ID);
 export const RPC_URL = import.meta.env.VITE_RPC_URL;
 
-export function getProgram(wallet: AnchorWallet | undefined) {
+export function getProgram(wallet?: AnchorWallet) {
+  const connection = new Connection(RPC_URL, "confirmed");
+
   if (!wallet) {
-    throw new Error("Wallet not connected");
+    // Read-only mode: create a dummy wallet for provider
+    const dummyWallet = {
+      publicKey: PublicKey.default,
+      signTransaction: async (tx: any) => tx,
+      signAllTransactions: async (txs: any[]) => txs,
+    } as AnchorWallet;
+
+    const provider = new AnchorProvider(connection, dummyWallet, {
+      commitment: "confirmed",
+    });
+
+    const program = new Program<SubscriptionsDapp>(idl as Idl, provider);
+    return { program, connection, provider };
   }
 
-  const connection = new Connection(RPC_URL, "confirmed");
   const provider = new AnchorProvider(connection, wallet, {
     commitment: "confirmed",
   });

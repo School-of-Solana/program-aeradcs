@@ -33,35 +33,21 @@ export const Marketplace = () => {
       setLoading(true);
       setError("");
 
-      if (!signTransaction || !signAllTransactions) {
-        const connection = new (await import("@solana/web3.js")).Connection(
-          import.meta.env.VITE_RPC_URL,
-          "confirmed"
-        );
-        const { Program } = await import("@coral-xyz/anchor");
-        const idl = await import("../idl/subscriptions_dapp.json");
-        const programId = new PublicKey(import.meta.env.VITE_PROGRAM_ID);
-        const program = new Program(idl.default as any, programId, {
-          connection,
-        } as any);
+      // Create wallet object if connected, otherwise undefined for read-only mode
+      const wallet =
+        publicKey && signTransaction && signAllTransactions
+          ? { publicKey, signTransaction, signAllTransactions }
+          : undefined;
 
-        const allPlans = await program.account.creatorProfile.all();
-        setPlans(allPlans as PlanData[]);
-        setLoading(false);
-        return;
-      }
-
-      const wallet = {
-        publicKey: publicKey!,
-        signTransaction,
-        signAllTransactions,
-      };
-
+      // getProgram works with or without wallet (read-only mode)
       const { program } = getProgram(wallet);
+
+      // Fetch all plans (works with or without wallet)
       const allPlans = await program.account.creatorProfile.all();
       setPlans(allPlans as PlanData[]);
 
-      if (publicKey) {
+      // Only check subscription status if wallet is connected
+      if (publicKey && wallet) {
         const statusMap: Record<string, boolean> = {};
         for (const plan of allPlans) {
           const key = `${plan.account.creator.toBase58()}-${plan.account.planId.toString()}`;
@@ -434,7 +420,7 @@ export const Marketplace = () => {
                   }}
                 >
                   {!publicKey
-                    ? "Connect Wallet"
+                    ? "Cannot subscribe without a wallet"
                     : isOwnPlan
                     ? "Your Plan"
                     : isSubscribed

@@ -41,9 +41,24 @@ export const CreatePlan = () => {
       return;
     }
 
+    if (priceNum > 1000) {
+      setError("Price exceeds maximum allowed (1000 SOL)");
+      return;
+    }
+
     const durationNum = parseInt(duration);
     if (isNaN(durationNum) || durationNum <= 0) {
       setError("Please enter a valid duration greater than 0");
+      return;
+    }
+
+    if (durationNum < 1) {
+      setError("Duration must be at least 1 day");
+      return;
+    }
+
+    if (durationNum > 365) {
+      setError("Duration exceeds maximum allowed (365 days)");
       return;
     }
 
@@ -111,28 +126,53 @@ export const CreatePlan = () => {
       }, 2000);
     } catch (err) {
       console.error("Error creating plan:", err);
+      console.log("Full error object:", err);
+      console.log("Error message:", (err as Error).message);
+      console.log("Error logs:", (err as any)?.logs);
+      console.log("Error stringified:", JSON.stringify(err, null, 2));
 
       let errorMessage = "Failed to create plan. Please try again.";
       const errMsg = (err as Error).message;
+      const errString = JSON.stringify(err);
+      const errorLogs = (err as any)?.logs || [];
+      const fullError = errMsg + " " + errString + " " + errorLogs.join(" ");
 
-      if (errMsg.includes("InvalidPrice")) {
+      if (fullError.includes("InvalidPrice") || fullError.includes("6000")) {
         errorMessage = "Price must be greater than 0.";
-      } else if (errMsg.includes("PriceTooHigh")) {
+      } else if (
+        fullError.includes("PriceTooHigh") ||
+        fullError.includes("6001")
+      ) {
         errorMessage = "Price exceeds maximum allowed (1000 SOL).";
-      } else if (errMsg.includes("InvalidDuration")) {
+      } else if (
+        fullError.includes("InvalidDuration") ||
+        fullError.includes("6002")
+      ) {
         errorMessage = "Duration must be at least 1 day.";
-      } else if (errMsg.includes("DurationTooLong")) {
+      } else if (
+        fullError.includes("DurationTooLong") ||
+        fullError.includes("6003")
+      ) {
         errorMessage = "Duration exceeds maximum allowed (365 days).";
-      } else if (errMsg.includes("EmptyPlanName")) {
+      } else if (
+        fullError.includes("EmptyPlanName") ||
+        fullError.includes("6004")
+      ) {
         errorMessage = "Plan name cannot be empty.";
-      } else if (errMsg.includes("PlanNameTooLong")) {
+      } else if (
+        fullError.includes("PlanNameTooLong") ||
+        fullError.includes("6005")
+      ) {
         errorMessage = "Plan name exceeds maximum length (200 characters).";
-      } else if (errMsg.includes("InsufficientFundsToCreatePlan")) {
+      } else if (
+        fullError.includes("InsufficientFundsToCreatePlan") ||
+        fullError.includes("6006")
+      ) {
         errorMessage =
           "Insufficient funds to create plan. You need SOL to pay for account rent.";
-      } else if (errMsg.includes("already in use")) {
+      } else if (fullError.includes("already in use")) {
         errorMessage = "This plan already exists.";
-      } else if (errMsg.includes("User rejected")) {
+      } else if (fullError.includes("User rejected")) {
         errorMessage = "Transaction was cancelled.";
       }
 
