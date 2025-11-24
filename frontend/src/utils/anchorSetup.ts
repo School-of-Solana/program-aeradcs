@@ -5,18 +5,8 @@ import type { AnchorWallet } from "@solana/wallet-adapter-react";
 import idl from "../idl/subscriptions_dapp.json";
 import type { SubscriptionsDapp } from "../types/subscriptions_dapp";
 
-console.log("Environment variables:", {
-  VITE_PROGRAM_ID: import.meta.env.VITE_PROGRAM_ID,
-  VITE_RPC_URL: import.meta.env.VITE_RPC_URL,
-});
-
 export const PROGRAM_ID = new PublicKey(import.meta.env.VITE_PROGRAM_ID);
 export const RPC_URL = import.meta.env.VITE_RPC_URL;
-
-console.log("Parsed values:", {
-  PROGRAM_ID: PROGRAM_ID.toString(),
-  RPC_URL,
-});
 
 export function getProgram(wallet?: AnchorWallet) {
   const connection = new Connection(RPC_URL, "confirmed");

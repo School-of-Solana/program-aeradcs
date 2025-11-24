@@ -106,10 +106,6 @@ export const CreatePlan = () => {
         navigate("/my-plans");
       }, 2000);
     } catch (err) {
-      console.error("Full error:", err);
-      console.error("Error message:", (err as Error).message);
-      console.error("Error logs:", (err as any)?.logs);
-
       let errorMessage = "Failed to create plan. Please try again.";
       const errMsg = (err as Error).message;
       const errString = JSON.stringify(err);
