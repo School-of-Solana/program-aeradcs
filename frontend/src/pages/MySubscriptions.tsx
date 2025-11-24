@@ -95,7 +95,6 @@ export const MySubscriptions = () => {
                 })
                 .view();
             } catch (err) {
-              console.error("Error checking subscription status:", err);
               isActive = false;
             }
 
@@ -109,7 +108,6 @@ export const MySubscriptions = () => {
 
         setSubscriptions(subscriptionsWithPlans as SubscriptionWithPlan[]);
       } catch (err) {
-        console.error("Error fetching subscriptions:", err);
         setError("Failed to load your subscriptions. Please try again.");
       } finally {
         setLoading(false);

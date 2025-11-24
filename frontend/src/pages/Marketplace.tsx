@@ -62,7 +62,6 @@ export const Marketplace = () => {
         setSubscriptionStatus(statusMap);
       }
     } catch (err) {
-      console.error("Error fetching plans:", err);
       setError("Failed to load plans. Please try again.");
     } finally {
       setLoading(false);
@@ -118,12 +117,6 @@ export const Marketplace = () => {
         plan.account.planId
       );
 
-      console.log("Subscribing to plan:");
-      console.log("  Plan ID:", plan.account.planId.toString());
-      console.log("  Creator:", plan.account.creator.toBase58());
-      console.log("  Subscriber:", publicKey.toBase58());
-      console.log("  Subscription PDA:", subscriptionPda.toBase58());
-
       const tx = await program.methods
         .subscribe(plan.account.planId, plan.account.creator)
         .accountsPartial({
@@ -135,8 +128,6 @@ export const Marketplace = () => {
         })
         .rpc();
 
-      console.log("Subscription transaction signature:", tx);
-
       setSubscriptionStatus((prev) => ({
         ...prev,
         [planKey]: true,
@@ -144,8 +135,6 @@ export const Marketplace = () => {
 
       await fetchPlans();
     } catch (err) {
-      console.error("Error subscribing:", err);
-
       let errorMessage = "Failed to subscribe. Please try again.";
       const errMsg = (err as Error).message;
 

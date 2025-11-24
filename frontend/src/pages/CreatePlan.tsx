@@ -87,16 +87,6 @@ export const CreatePlan = () => {
       // Derive PDA for creator profile
       const [creatorProfilePda] = getCreatorProfilePda(publicKey, planId);
 
-      console.log("Creating plan with:");
-      console.log("  Plan ID:", planId.toString());
-      console.log("  Name:", planName);
-      console.log("  Price (SOL):", priceNum);
-      console.log("  Price (lamports):", priceInLamports);
-      console.log("  Duration (days):", durationNum);
-      console.log("  Creator:", publicKey.toBase58());
-      console.log("  PDA:", creatorProfilePda.toBase58());
-
-      // Call the create_subscription_plan instruction
       const tx = await program.methods
         .createSubscriptionPlan(
           planId,
@@ -111,8 +101,6 @@ export const CreatePlan = () => {
         })
         .rpc();
 
-      console.log("Transaction signature:", tx);
-
       setSuccess("Plan created successfully!");
 
       // Clear form
@@ -125,12 +113,6 @@ export const CreatePlan = () => {
         navigate("/my-plans");
       }, 2000);
     } catch (err) {
-      console.error("Error creating plan:", err);
-      console.log("Full error object:", err);
-      console.log("Error message:", (err as Error).message);
-      console.log("Error logs:", (err as any)?.logs);
-      console.log("Error stringified:", JSON.stringify(err, null, 2));
-
       let errorMessage = "Failed to create plan. Please try again.";
       const errMsg = (err as Error).message;
       const errString = JSON.stringify(err);

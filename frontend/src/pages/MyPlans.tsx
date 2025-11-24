@@ -55,7 +55,6 @@ export const MyPlans = () => {
 
         setPlans(userPlans as PlanData[]);
       } catch (err) {
-        console.error("Error fetching plans:", err);
         setError("Failed to load your plans. Please try again.");
       } finally {
         setLoading(false);
