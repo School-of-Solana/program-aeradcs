@@ -15,7 +15,3 @@ export const solToLamports = (sol: number): number => {
 export const formatDate = (timestamp: number): string => {
   return new Date(timestamp * 1000).toLocaleDateString();
 };
-
-export const isSubscriptionActive = (expiresAt: number): boolean => {
-  return Math.floor(Date.now() / 1000) < expiresAt;
-};
