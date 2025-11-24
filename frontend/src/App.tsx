@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Marketplace, MyPlans, MySubscriptions, CreatePlan } from "./pages";
+import { TopPlans } from "./pages/TopPlans";
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Marketplace />} />
+        <Route path="/top-plans" element={<TopPlans />} />
         <Route path="/my-plans" element={<MyPlans />} />
         <Route path="/my-subscriptions" element={<MySubscriptions />} />
         <Route path="/create" element={<CreatePlan />} />

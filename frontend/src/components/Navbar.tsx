@@ -45,6 +45,17 @@ export const Navbar = () => {
               Marketplace
             </Link>
             <Link
+              to="/top-plans"
+              style={{
+                color: "#6b7280",
+                textDecoration: "none",
+                fontSize: "0.875rem",
+                fontWeight: "500",
+              }}
+            >
+              Top Plans
+            </Link>
+            <Link
               to="/my-plans"
               style={{
                 color: "#6b7280",
